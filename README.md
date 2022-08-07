@@ -2,7 +2,7 @@ Twitterの#NGS_DATダグもご参照ください
 
 # CancerDAT
 
-![Top](https://github.com/Cancer-Genome/CancerDAT/blob/main/CancerDAT.png)  
+![Top](https://github.com/Kao-nashi/CancerDAT/blob/main/CancerDAT.png)  
 このページは『がんゲノムデータ解析』のサポートページです。  
 
 ## 参考URL
