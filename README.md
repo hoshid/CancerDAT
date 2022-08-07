@@ -24,4 +24,3 @@ Twitterの#NGS_DATダグもご参照ください
 
 ## 質問・コメントなど
 * Twitter ハッシュタグ  [#CancerDAT](https://twitter.com/hashtag/CancerDAT) をつけてツイートしていただくと本書の執筆者もしくは読者からサポートいただけると思います。
-?src=hashtag_click
