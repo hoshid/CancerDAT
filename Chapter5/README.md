@@ -4,8 +4,10 @@
 教科書に掲載したコマンド一覧は[こちら](main.txt)です。
 
 第５章のコマンドなどへの質問は
+* Twitter ハッシュタグ  [#CancerDAT](https://twitter.com/hashtag/CancerDAT) をつけてツイート
+* 本レポジトリの issueページ 経由でのコメントやプルリクエスト
+* 上記で対応がされない場合は[関真秀先生へのメール](<mailto:mseki@edu.k.u-tokyo.ac.jp>)
 
-
-または[関真秀先生](<mailto:mseki@edu.k.u-tokyo.ac.jp>)までお願いいたします。
+でお願いいたします。
 
 本レポジトリは筆者の[関真秀先生](https://www.u-tokyo.ac.jp/focus/ja/people/k0001_01986.html)に承諾をいただき清水が作成しております。
