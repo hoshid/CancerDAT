@@ -1,4 +1,4 @@
-Twitterの[#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参照ください
+Twitterの [#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参照ください
 
 # CancerDAT
 
