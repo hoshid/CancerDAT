@@ -1,0 +1,14 @@
+シークエンスデータの準備
+mkdir -p ~/DRY_fusion # ホームディレクトリ直下に DRY_fusion ディレクトリ（名前は何でもいいです）を作成
+mkdir -p ~/DRY_fusion/data # data ディレクトリを作成
+mkdir -p ~/DRY_fusion/tools # tools ディレクトリを作成
+cd ~/data # dataディレクトリに移動
+mkdir -p fastq # fastqディレクトリを作成
+cd fastq # fastqディレクトリに移動
+wget ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001846/DRX015062/DRR016709_1.fastq.bz2
+wget ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001846/DRX015062/DRR016709_2.fastq.bz2
+bzip2 -cd DRR016709_1.fastq.bz2 | gzip > DRR016709_1.fastq.gz
+bzip2 -cd DRR016709_2.fastq.bz2 | gzip > DRR016709_2.fastq.gz
+bzip2 -cd DRR016709_1.fastq.bz2 > DRR016709_1.fastq
+bzip2 -cd DRR016709_2.fastq.bz2 > DRR016709_2.fastq  
+
