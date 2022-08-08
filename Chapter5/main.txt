@@ -74,7 +74,6 @@ nanomonsv insert_classify \
  RERF-LC-MS.nanomonsv.result_insert_classify.txt \
  hg38.fa
 less RERF-LC-MS.nanomonsv.result_insert_classify.txt
-
 nanomonsv parse Normal_sorted.bam Normal
 nanomonsv parse Tumor_sorted.bam Tumor
 nanomonsv get Tumor Tumor_sorted.bam \
