@@ -8,7 +8,7 @@ conda update --all
 
 # 作業用のディレクトリ（~/analysis）を作成し、ファイルを設置する。
 cd ~
-mkdir -p analysis
+mkdir analysis
 cd ~/analysis
 wget https://kero.hgc.jp/cgi-bin/download/long_read/adenocarcinoma_cell_lines/genome/promethion/RERF-LC-MS/1d.fq.gz 
 conda install -c bioconda seqkit
@@ -108,7 +108,7 @@ whatshap
 
 # ショートリードシークエンスデータのダウンロードおよび前処理
 cd ~/analysis
-SITE= ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001859/DRX015213/
+SITE=ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001859/DRX015213/
 wget ${SITE}/DRR016913_1.fastq.bz2
 wget ${SITE}/DRR016913_2.fastq.bz2
 wget ${SITE}/DRR016914_1.fastq.bz2
