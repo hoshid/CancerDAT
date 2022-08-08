@@ -29,6 +29,8 @@ wget https://github.com/alexdobin/STAR/archive/2.7.9a.tar.gz
 tar -xvzf 2.7.9a.tar.gz # 解凍する
 export PATH=~/DRY_fusion/tools/STAR-2.7.9a/bin/Linux_x86_64:$PATH # PATHを通す
 STAR --version # STARを実行して動くか確認
+
+# SAMtoolsおよびHTSlibを準備する
 cd ~/DRY_fusion/tools # toolsディレクトリに移動
 wget https://github.com/samtools/samtools/releases/download/1.12/samtools-1.12.tar.bz2
 tar -jxvf samtools-1.12.tar.bz2 # 解凍する
@@ -45,6 +47,8 @@ make install
 export PATH=~/DRY_fusion/tools/samtools-1.12/htslib-1.12/bin:$PATH # PATHを通す
 bgzip --version # bgzipを実行して動くか確認
 tabix --version # tabixを実行して動くか確認
+
+# PerlのモジュールをCPAN（Comprehensive Perl Archive Network）からインストールする
 cd # ホームディレクトリに移動する
 mkdir -p ~/.cpan # .cpanディレクトリを作成する
 perl -MCPAN -e 'mkmyconfig'
@@ -53,6 +57,9 @@ cpan
 sudo apt-get install libdb-dev
 pip install --user igv-reports requests # pipでインストールする
 export PATH=~/.local/bin:${PATH} # PATHを設定する
+
+# IGVをインストールする
+[こちら](https://software.broadinstitute.org/software/igv/download)から解析環境に合わせてダウンロードし、インストールする。
 
 # マッピング～融合遺伝子検出
 mkdir -p ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリ（名前は自由）を作成する
