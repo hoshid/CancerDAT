@@ -13,12 +13,17 @@ bzip2 -cd DRR016709_1.fastq.bz2 > DRR016709_1.fastq
 bzip2 -cd DRR016709_2.fastq.bz2 > DRR016709_2.fastq
 
 # STAR-Fusionを用いた解析
+# STAR-Fusionをダウンロードする
 cd ~/DRY_fusion/tools # toolsディレクトリに移動
 git clone --recursive https://github.com/STAR-Fusion/STAR-Fusion.git
 ./STAR-Fusion/STAR-Fusion --version # 動くかどうかと、バージョンを確認する（2021年5月現在、version 1.10.0）
+
+# リファレンスデータを用意する
 cd ~/DRY_fusion/data # dataディレクトリに移動
 wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.10/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play.tar.gz
 tar xvzf GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play.tar.gz # 解凍する
+
+# STARを準備する
 cd ~/DRY_fusion/tools # toolsディレクトリに移動
 wget https://github.com/alexdobin/STAR/archive/2.7.9a.tar.gz
 tar -xvzf 2.7.9a.tar.gz # 解凍する
