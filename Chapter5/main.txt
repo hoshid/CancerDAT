@@ -1,1 +1,50 @@
+# 解析環境の準備
+# Miniconda
+cd ~
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+export PATH=~/miniconda3/bin:$PATH
+conda update --all
+
+# 作業用のディレクトリ（~/analysis）を作成し、ファイルを設置する。
+cd ~
+mkdir -p analysis
+cd ~/analysis
+wget https://kero.hgc.jp/cgi-bin/download/long_read/adenocarcinoma_cell_lines/genome/promethion/RERF-LC-MS/1d.fq.gz 
+conda install -c bioconda seqkit
+seqkit stats 1d.fq.gz
+
+# 解析①：構造変異検出
+# ツールの準備
+conda install -c bioconda minimap2
+minimap2
+conda install -c bioconda samtools
+samtools
+cd ~/miniconda3/lib
+ln –s libcrypto.so.1.1 libcrypto.so.1.0.0
+pip install nanomonsv
+nanomonsv -h
+conda install -c bioconda pysam
+conda install -c bioconda parasail-python
+conda install -c bioconda htslib
+conda install -c bioconda mafft
+conda install -c bioconda racon
+conda install -c bioconda bwa
+conda install repeatmasker
+conda install -c bioconda bedtools
+pip install annot_utils
+conda install -c bioconda snpeff
+snpEff
+wget https://data.broadinstitute.org/igv/projects/downloads/2.9/IGV_Linux_2.9.4_WithJava.zip
+unzip IGV_Linux_2.9.4_WithJava.zip
+cd IGV_Linux_2.9.4/
+sh ./igv.sh
+
+# 参照ゲノム配列の準備
+cd ~/analysis
+wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz
+tar -xf hg38.chromFa.tar.gz
+for i in {1..22} X Y M; do cat chroms/chr${i}.fa >> hg38.fa; done
+minimap2 -d hg38.mmi hg38.fa
+bwa index -a bwtsw -p hg38.fa hg38.fa
 
