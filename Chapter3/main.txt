@@ -10,5 +10,46 @@ wget ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001846/DRX015062
 bzip2 -cd DRR016709_1.fastq.bz2 | gzip > DRR016709_1.fastq.gz
 bzip2 -cd DRR016709_2.fastq.bz2 | gzip > DRR016709_2.fastq.gz
 bzip2 -cd DRR016709_1.fastq.bz2 > DRR016709_1.fastq
-bzip2 -cd DRR016709_2.fastq.bz2 > DRR016709_2.fastq  
+bzip2 -cd DRR016709_2.fastq.bz2 > DRR016709_2.fastq
+
+STAR-Fusionを用いた解析
+cd ~/DRY_fusion/tools # toolsディレクトリに移動
+git clone --recursive https://github.com/STAR-Fusion/STAR-Fusion.git
+./STAR-Fusion/STAR-Fusion --version # 動くかどうかと、バージョンを確認する（2021年5月現在、version 1.10.0）
+cd ~/DRY_fusion/data # dataディレクトリに移動
+wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.10/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play.tar.gz
+tar xvzf GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play.tar.gz # 解凍する
+cd ~/DRY_fusion/tools # toolsディレクトリに移動
+wget https://github.com/alexdobin/STAR/archive/2.7.9a.tar.gz
+tar -xvzf 2.7.9a.tar.gz # 解凍する
+export PATH=~/DRY_fusion/tools/STAR-2.7.9a/bin/Linux_x86_64:$PATH # PATHを通す
+STAR --version # STARを実行して動くか確認
+cd ~/DRY_fusion/tools # toolsディレクトリに移動
+wget https://github.com/samtools/samtools/releases/download/1.12/samtools-1.12.tar.bz2
+tar -jxvf samtools-1.12.tar.bz2 # 解凍する
+cd samtools-1.12/
+./configure --prefix=${HOME}/DRY_fusion/tools/samtools-1.12 # --prefixでツールをインストールしたい場所を指定する
+make
+make install
+export PATH=~/DRY_fusion/tools/samtools-1.12/bin:$PATH # PATHを通す
+samtools version # SAMtoolsを実行して動くか確認
+cd htslib-1.12
+./configure --prefix=${HOME}/DRY_fusion/tools/samtools-1.12/htslib-1.12
+make
+make install
+export PATH=~/DRY_fusion/tools/samtools-1.12/htslib-1.12/bin:$PATH # PATHを通す
+bgzip --version # bgzipを実行して動くか確認
+tabix --version # tabixを実行して動くか確認
+cd # ホームディレクトリに移動する
+mkdir -p ~/.cpan # .cpanディレクトリを作成する
+perl -MCPAN -e 'mkmyconfig'
+eval $(perl -I${HOME}/perl5/lib/perl5 -Mlocal::lib)
+cpan
+sudo apt-get install libdb-dev
+pip install --user igv-reports requests # pipでインストールする
+export PATH=~/.local/bin:${PATH} # PATHを設定する
+
+マッピング～融合遺伝子検出
+mkdir -p ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリ（名前は自由）を作成する
+cd ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリに移動する
 
