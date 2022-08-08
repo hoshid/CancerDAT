@@ -76,13 +76,17 @@ eval $(perl -I${HOME}/perl5/lib/perl5 -Mlocal::lib)
 # Python module
 export PATH=~/.local/bin:${PATH}  
 
+# STAR-Fusionを実行する
 ~/DRY_fusion/tools/STAR-Fusion/STAR-Fusion \
---genome_lib_dir ~/DRY_fusion/data/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir \
+--genome_lib_dir
+~/DRY_fusion/data/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir \
 --left_fq ~/DRY_fusion/data/fastq/DRR016709_1.fastq.gz \
 --right_fq ~/DRY_fusion/data/fastq/DRR016709_2.fastq.gz \
 --output_dir lc2ad_star_fusion \
     --FusionInspector validate \
     --examine_coding_effect  
-
+# STARのマッピング結果をIGVで開くために、BAMをソートしてindexをつける
 samtools sort -@ 4 -o lc2ad_star_fusion/Aligned.out.sorted.bam lc2ad_star_fusion/Aligned.out.bam
 samtools index lc2ad_star_fusion/Aligned.out.sorted.bam
+
+//
