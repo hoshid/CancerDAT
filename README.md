@@ -7,6 +7,7 @@ Twitterの[#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参照
 
 ## 参考URL
 * [メディカル・サイエンス・インターナショナル『がんゲノムデータ解析』公式ページ](https://www.medsi.co.jp/products/detail/3866)  
+* [Amazon 書籍販売URL](https://amzn.to/3p2oASS)
 * Twitter ハッシュタグ [#CancerDAT](https://twitter.com/hashtag/CancerDAT)
 
 ## 正誤表  
