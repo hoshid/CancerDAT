@@ -21,7 +21,7 @@ Twitterの [#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参�
 * 第6章 がんのGWAS
 * [第7章 がんのPRSによる疾患発症リスク予測](https://github.com/hacchy1983/prs-on-hail-public)
 * 第8章 がんのエピゲノム解析
-* 第9章 がんのcfDNA解析
+* [第9章 がんのcfDNA解析](Chapter9)
 
 ## 質問・コメントなど
 * Twitter ハッシュタグ  [#CancerDAT](https://twitter.com/hashtag/CancerDAT) をつけてツイートしていただくと本書の執筆者もしくは読者からサポートいただけると思います。
