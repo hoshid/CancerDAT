@@ -48,3 +48,54 @@ for i in {1..22} X Y M; do cat chroms/chr${i}.fa >> hg38.fa; done
 minimap2 -d hg38.mmi hg38.fa
 bwa index -a bwtsw -p hg38.fa hg38.fa
 
+# マッピング
+minimap2 -ax map-ont --MD -t 5 hg38.mmi 1d.fq.gz | \
+ samtools view -bS -@5 | \
+ samtools sort -@5 -o RERF-LC-MS_sorted.bam
+samtools index RERF-LC-MS_sorted.bam
+
+# NanomonsvによるSV検出
+nanomonsv parse RERF-LC-MS_sorted.bam RERF-LC-MS
+ls -lh | grep gz | grep RERF-LC-MS
+nanomonsv get RERF-LC-MS RERF-LC-MS_sorted.bam \
+ hg38.fa --use_racon
+cat RERF-LC-MS.nanomonsv.result.txt | grep PASS | wc -l
+wget https://raw.githubusercontent.com/friend1ws/nanomonsv/master/misc/sv_type.py
+python sv_type.py RERF-LC-MS.nanomonsv.result.txt RERF-LC-MS.nanomonsv.result_svtype.txt
+cat RERF-LC-MS.nanomonsv.result_svtype.txt | grep PASS | grep Insertion | wc -l
+cat RERF-LC-MS.nanomonsv.result_svtype.txt | grep PASS | grep Deletion | wc -l
+cat RERF-LC-MS.nanomonsv.result_svtype.txt | grep PASS | grep Duplication | wc -l
+cat RERF-LC-MS.nanomonsv.result_svtype.txt | grep PASS | grep Inversion | wc -l
+cat RERF-LC-MS.nanomonsv.result_svtype.txt | grep PASS | grep Translocation | wc -l
+export BLASTDB_LMDB_MAP_SIZE=1000000
+nanomonsv insert_classify \
+ --genome_id hg38 \
+ RERF-LC-MS.nanomonsv.result_svtype.txt \
+ RERF-LC-MS.nanomonsv.result_insert_classify.txt \
+ hg38.fa
+less RERF-LC-MS.nanomonsv.result_insert_classify.txt
+
+nanomonsv parse Normal_sorted.bam Normal
+nanomonsv parse Tumor_sorted.bam Tumor
+nanomonsv get Tumor Tumor_sorted.bam \
+ --control_prefix Normal --control_bam Normal_sorted.bam \
+ hg38.fa --use_racon
+
+# アノテーション
+snpEff databases | grep GRCh38
+snpEff download -v GRCh38.99 -c ~/miniconda3/share/snpeff-5.0-1/snpEff.config
+export _JAVA_OPTIONS='-XX:+UseSerialGC -Xmx5g -Xms1g'
+snpEff GRCh38.99 RERF-LC-MS.nanomonsv.result.vcf > RERF-LC-MS.nanomonsv.result.snpeff.vcf
+cat RERF-LC-MS.nanomonsv.result.snpeff.vcf | grep PASS | grep protein_coding | less
+
+# 可視化
+cd IGV_Linux_2.9.4/
+sh ./igv.sh
+
+# ②：フェージング解析
+# ツールの準備
+
+
+
+
+
