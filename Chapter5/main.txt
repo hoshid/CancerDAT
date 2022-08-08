@@ -94,8 +94,139 @@ sh ./igv.sh
 
 # ②：フェージング解析
 # ツールの準備
+conda install bzip2
+bzip2
+conda install -c bioconda fastp
+fastp
+conda install -c bioconda bwa
+bwa
+conda install -c bioconda gatk4
+gatk
+conda install -c bioconda bcftools
+bcftools
+conda install -c bioconda whatshap
+whatshap
 
+# ショートリードシークエンスデータのダウンロードおよび前処理
+cd ~/analysis
+SITE= ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA001/DRA001859/DRX015213/
+wget ${SITE}/DRR016913_1.fastq.bz2
+wget ${SITE}/DRR016913_2.fastq.bz2
+wget ${SITE}/DRR016914_1.fastq.bz2
+wget ${SITE}/DRR016914_2.fastq.bz2
+wget ${SITE}/DRR016915_1.fastq.bz2
+wget ${SITE}/DRR016915_2.fastq.bz2
+bzip2 -d DRR016913_1.fastq.bz2
+bzip2 -d DRR016913_2.fastq.bz2
+fastp --thread 4 \
+ --in1 DRR016913_1.fastq --in2 DRR016913_2.fastq \
+ --out1 DRR016913_1.filtered.fastq.gz  --out2 DRR016913_2.filtered.fastq.gz \
+ --json repfastp_DRR016913.json --html repfastp_DRR016913.html
+bzip2 DRR016913_1.fastq
+bzip2 DRR016913_2.fastq
 
+# マッピング（ショートリード）
+bwa mem –t 8 \
+ -R "@RG\tID:None\tSM:RERF-LC-MS\tPL:illumina\tLB:None" \
+ hg38.fa DRR016913_1.filtered.fastq.gz DRR016913_2.filtered.fastq.gz \
+ | samtools sort -@8 –O bam -o DRR016913.bam
+samtools index -@8 DRR016913.bam
+SAMPLE=RERF-LC-MS
+samtools merge -@8 ${SAMPLE}.merged.bam \
+ DRR016913.bam DRR016914.bam DRR016915.bam
+samtools sort -@8 -o ${SAMPLE}.merged.sorted.bam ${SAMPLE}.merged.bam
+samtools index -@8 ${SAMPLE}.merged.sorted.bam
 
+# SNP検出（ショートリード）
+samtools faidx hg38.fa
+samtools dict hg38.fa > hg38.dict
+SITE=ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38
+wget ${SITE}/1000G_omni2.5.hg38.vcf.gz
+wget ${SITE}/1000G_omni2.5.hg38.vcf.gz.tbi
+wget ${SITE}/1000G_phase1.snps.high_confidence.hg38.vcf.gz
+wget ${SITE}/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi
+wget ${SITE}/dbsnp_138.hg38.vcf.gz
+wget ${SITE}/dbsnp_138.hg38.vcf.gz.tbi
+wget ${SITE}/hapmap_3.3.hg38.vcf.gz
+wget ${SITE}/hapmap_3.3.hg38.vcf.gz.tbi
+wget ${SITE}/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+wget ${SITE}/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi
+SAMPLE=RERF-LC-MS
+samtools collate -@8 -o namecollate.bam ${SAMPLE}.merged.sorted.bam
+samtools fixmate -@8 -m namecollate.bam fixmate.bam 
+samtools sort -@8 -o fixmate.sorted.bam fixmate.bam
+samtools markdup -@8 fixmate.sorted.bam ${SAMPLE}.markdup.bam
+samtools index -@8 ${SAMPLE}.markdup.bam
+gatk --java-options "-Xmx20G" BaseRecalibrator \
+ -I ${SAMPLE}.markdup.bam \
+ -R hg38.fa \
+ --known-sites 1000G_phase1.snps.high_confidence.hg38.vcf.gz \
+ --known-sites Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
+ --known-sites dbsnp_138.hg38.vcf.gz \
+ -O ${SAMPLE}.recal.table
+gatk --java-options "-Xmx20G" ApplyBQSR \
+ -R hg38.fa \
+ -I ${SAMPLE}.markdup.bam \
+ --bqsr-recal-file ${SAMPLE}.recal.table \
+ -O ${SAMPLE}.recal.bam
+gatk --java-options "-Xmx20G -DGATK_STACKTRACE_ON_USER_EXCEPTION=true" \
+ HaplotypeCaller \
+ -R hg38.fa \
+ -I ${SAMPLE}.recal.bam \
+ -O ${SAMPLE}.snps.vcf.gz \
+ --dbsnp dbsnp_138.hg38.vcf.gz
+VCF_PRE=${SAMPLE}.snps
+gatk --java-options "-Xmx20G" VariantRecalibrator \
+ -V ${VCF_PRE}.vcf.gz \
+ -R hg38.fa \
+ --resource:1000G,known=false,training=true,truth=false,prior=10.0 \
+ 1000G_phase1.snps.high_confidence.hg38.vcf.gz \
+ --resource:hapmap,known=false,training=true,truth=true,prior=15.0 \
+ hapmap_3.3.hg38.vcf.gz \
+ --resource:dbsnp,known=true,training=false,truth=false,prior=2.0 \
+ dbsnp_138.hg38.vcf.gz \
+ --resource:omni,known=false,training=true,truth=true,prior=12.0  1000G_omni2.5.hg38.vcf.gz \
+ -an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR -an DP \
+ -mode SNP \
+--max-gaussians 4 \
+ -O ${VCF_PRE}.recal \
+ -tranches-file ${VCF_PRE}.tranches \
+ --rscript-file ${VCF_PRE}.plots.R
+gatk --java-options "-Xmx20G" ApplyVQSR \
+ -R hg38.fa \
+ -V ${VCF_PRE}.vcf.gz \
+ -O ${VCF_PRE}.recal.vcf.gz \
+ --truth-sensitivity-filter-level 99.0 \
+ --tranches-file ${VCF_PRE}.tranches \
+ --recal-file ${VCF_PRE}.recal \
+ -mode SNP
+bcftools view --threads 4 -f PASS -Oz \
+ -o ${VCF_PRE}.recal.filtered.PASS.vcf.gz \
+ ${VCF_PRE}.recal.vcf.gz
+tabix ${VCF_PRE}.recal.filtered.PASS.vcf.gz
+whatshap phase --ignore-read-groups \
+ --reference hg38.fa \
+ -o ${SAMPLE}.snps.phased.vcf \
+ ${SAMPLE}.snps.recal.filtered.PASS.vcf.gz \
+ ${SAMPLE}_sorted.bam
+bgzip ${SAMPLE}.snps.phased.vcf
+tabix ${SAMPLE}.snps.phased.vcf.gz
+cat hg38.dict | grep @SQ |\
+ awk -F '\t' -v OFS='\t' '{print substr($2,4),substr($3,4)}' \
+ > hg38.chromlen
+whatshap stats --gtf=${SAMPLE}.snps.phased.vcf.stats.gtf \
+ ${SAMPLE}.snps.phased.vcf.gz \
+ --chr-length hg38.chromlen\
+ --block-list ${SAMPLE}.snps.phased.vcf.blocklist \
+ --tsv=phasestats.${SAMPLE}.tsv
+cat phasestats.RERF-LC-MS.tsv | column -t | less -iMS
+whatshap haplotag --ignore-read-groups \
+ -o ${SAMPLE}.sorted.haplotagged.bam \
+ ${SAMPLE}.snps.phased.vcf.gz ${SAMPLE}_sorted.bam
+samtools index -@8 ${SAMPLE}.sorted.haplotagged.bam
 
+# 可視化
+cd IGV_Linux_2.9.4/
+sh ./igv.sh
 
+//
