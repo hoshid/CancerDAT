@@ -85,6 +85,7 @@ export PATH=~/.local/bin:${PATH}
 --output_dir lc2ad_star_fusion \
     --FusionInspector validate \
     --examine_coding_effect  
+
 # STARのマッピング結果をIGVで開くために、BAMをソートしてindexをつける
 samtools sort -@ 4 -o lc2ad_star_fusion/Aligned.out.sorted.bam lc2ad_star_fusion/Aligned.out.bam
 samtools index lc2ad_star_fusion/Aligned.out.sorted.bam
