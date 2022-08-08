@@ -3,5 +3,9 @@
 
 教科書に掲載したコマンド一覧は[こちら](main.txt)です。
 
+第５章のコマンドなどへの質問は
+
+
+または[関真秀先生](<mailto:mseki@edu.k.u-tokyo.ac.jp>)までお願いいたします。
 
 本レポジトリは筆者の[関真秀先生](https://www.u-tokyo.ac.jp/focus/ja/people/k0001_01986.html)に承諾をいただき清水が作成しております。
