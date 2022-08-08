@@ -1,4 +1,4 @@
-シークエンスデータの準備
+### シークエンスデータの準備
 mkdir -p ~/DRY_fusion # ホームディレクトリ直下に DRY_fusion ディレクトリ（名前は何でもいいです）を作成
 mkdir -p ~/DRY_fusion/data # data ディレクトリを作成
 mkdir -p ~/DRY_fusion/tools # tools ディレクトリを作成
