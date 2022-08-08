@@ -65,15 +65,15 @@ https://software.broadinstitute.org/software/igv/download から解析環境に�
 mkdir -p ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリ（名前は自由）を作成する
 cd ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリに移動する
 
-# STAR
+# STARの設定
 export PATH=~/DRY_fusion/tools/STAR-2.7.9a/bin/Linux_x86_64:$PATH
-# SAMtools
+# SAMtoolsの設定
 export PATH=~/DRY_fusion/tools/samtools-1.12/bin:$PATH
-# htslib
+# htslibの設定
 export PATH=~/DRY_fusion/tools/samtools-1.12/htslib-1.12/bin:$PATH
-# Perl module
+# Perl moduleの設定
 eval $(perl -I${HOME}/perl5/lib/perl5 -Mlocal::lib)
-# Python module
+# Python moduleの設定
 export PATH=~/.local/bin:${PATH}  
 
 # STAR-Fusionを実行する
