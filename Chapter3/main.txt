@@ -59,7 +59,7 @@ pip install --user igv-reports requests # pipでインストールする
 export PATH=~/.local/bin:${PATH} # PATHを設定する
 
 # IGVをインストールする
-[こちら](https://software.broadinstitute.org/software/igv/download)から解析環境に合わせてダウンロードし、インストールする。
+https://software.broadinstitute.org/software/igv/download から解析環境に合わせてダウンロードし、インストールする。
 
 # マッピング～融合遺伝子検出
 mkdir -p ~/DRY_fusion/work_STAR_Fusion # work_STAR_Fusionディレクトリ（名前は自由）を作成する
