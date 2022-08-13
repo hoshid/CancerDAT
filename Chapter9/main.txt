@@ -1,0 +1,109 @@
+# Homebrewのインストール
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 解析用ソフトウェアのインストール
+brew install bwa
+brew install bcftools
+brew install picard-tools
+brew install r
+brew install igv
+brew install csvkit
+brew install python3
+brew list
+
+# SRA Toolkitのインストールと設定
+brew install sratoolkit
+vdb-config -i
+
+# VarScan2のインストールと確認
+curl -L https://github.com/dkoboldt/varscan/raw/master/VarScan.v2.4.4.jar -o VarScan.v2.4.4.jar
+java -version
+java -jar VarScan.v2.4.4.jar
+
+# ANNOVARのインストール
+# ブラウザで下記のページにアクセスし、"annovar.latest.tar.gz"をダウンロードする
+# https://www.openbioinformatics.org/annovar/annovar_download_form.php
+tar zxvf annovar.latest.tar.gz
+
+# Sequenzaのインストール
+R
+# 以下6行はRでの作業
+# > if (!requireNamespace("BiocManager", quietly = TRUE))
+#      install.packages("BiocManager")
+# > BiocManager::install("copynumber")
+# > install.packages("sequenza")
+# > library(sequenza)
+# > q()
+
+# sequenza-utilsのインストール
+/usr/local/bin/pip3 install sequenza-utils --user
+
+# 演習用データのダウンロード
+fasterq-dump -o cfDNA-ONCGH-CRC01 ERR867636
+fasterq-dump -o PBMC-ONCGH-CRC01 ERR867635
+
+# ヒトリファレンスゲノムのダウンロード
+curl ftp://ftp.broadinstitute.org/pub/seq/references/Homo_sapiens_assembly19.fasta -o human_b37.fasta
+md5 human_b37.fasta
+
+# BWAのインデックス作成とマッピング
+bwa index human_b37.fasta
+bwa mem human_b37.fasta cfDNA-ONCGH-CRC01_1.fastq cfDNA-ONCGH-CRC01_2.fastq | samtools view -b -o cfDNA-ONCGH-CRC01.bam
+bwa mem human_b37.fasta PBMC-ONCGH-CRC01_1.fastq PBMC-ONCGH-CRC01_2.fastq | samtools view -b -o PBMC-ONCGH-CRC01.bam
+
+# BAMファイルのソート
+samtools sort -o cfDNA-ONCGH-CRC01.sort.bam cfDNA-ONCGH-CRC01.bam
+samtools sort -o PBMC-ONCGH-CRC01.sort.bam PBMC-ONCGH-CRC01.bam
+
+# 重複リードのマーク
+picard MarkDuplicates -I cfDNA-ONCGH-CRC01.sort.bam -M cfDNA-ONCGH-CRC01.mkdup.metrics -O cfDNA-ONCGH-CRC01.sort.mkdup.bam
+picard MarkDuplicates -I PBMC-ONCGH-CRC01.sort.bam -M PBMC-ONCGH-CRC01.mkdup.metrics -O PBMC-ONCGH-CRC01.sort.mkdup.bam
+
+# 変異の検出
+samtools mpileup -q 1 -f human_b37.fasta PBMC-ONCGH-CRC01.sort.mkdup.bam cfDNA-ONCGH-CRC01.sort.mkdup.bam > ONCGH-CRC01.mpileup
+java -Xmx1G -jar VarScan.v2.4.4.jar somatic ONCGH-CRC01.mpileup ONCGH-CRC01.varscan --mpileup 1 --min-var-freq 0.1 --somatic-p-value 0.05 --output-vcf 1
+
+# SNVとindelのVCFファイルを合併
+bgzip ONCGH-CRC01.varscan.snp.vcf
+bgzip ONCGH-CRC01.varscan.indel.vcf
+bcftools index ONCGH-CRC01.varscan.snp.vcf.gz
+bcftools index ONCGH-CRC01.varscan.indel.vcf.gz
+bcftools concat -o ONCGH-CRC01.varscan.both.vcf -a ONCGH-CRC01.varscan.snp.vcf.gz ONCGH-CRC01.varscan.indel.vcf.gz
+
+# 体細胞変異を抽出
+bcftools filter -i 'SOMATIC = 1' -o ONCGH-CRC01.varscan.both.somatic.vcf ONCGH-CRC01.varscan.both.vcf
+
+# 体細胞変異のアノテーション
+./annovar/table_annovar.pl ONCGH-CRC01.varscan.both.somatic.vcf ./annovar/humandb -buildver hg19 -out ONCGH-CRC01 -remove -protocol refGene -operation g -nastring . --vcfinput
+in2csv -f csv -t ONCGH-CRC01.hg19_multianno.txt > ONCGH-CRC01.hg19_multianno.csv
+
+# 非同義変異の抽出
+grep -e Chr -e nonsynonymous -e frameshift -e stopgain -e splicing ONCGH-CRC01.hg19_multianno.csv > ONCGH-CRC01.hg19_multianno.exonic.csv
+
+# IGVによる変異の視認
+samtools index cfDNA-ONCGH-CRC01.sort.mkdup.bam
+samtools index PBMC-ONCGH-CRC01.sort.mkdup.bam
+igv cfDNA-ONCGH-CRC01.sort.mkdup.bam,PBMC-ONCGH-CRC01.sort.mkdup.bam 17:7578406
+igv cfDNA-ONCGH-CRC01.sort.mkdup.bam,PBMC-ONCGH-CRC01.sort.mkdup.bam 5:112174241
+
+# コピー数解析
+sequenza-utils gc_wiggle -w 50 --fasta human_b37.fasta -o human_b37.gc50Base.wig.gz
+sequenza-utils bam2seqz -n PBMC-ONCGH-CRC01.sort.mkdup.bam -t cfDNA-ONCGH-CRC01.sort.mkdup.bam --fasta human_b37.fasta -gc human_b37.gc50Base.wig.gz -o ONCGH-CRC01.seqz.gz
+curl -L -o IRCC-TARGET-panel.bed https://ndownloader.figshare.com/files/28576212
+R
+# 以下11行はRでの作業
+# > library(sequenza)
+# > col.names <- c("chrom", "start.pos", "end.pos", "gene")
+# > breaks <- read.table("IRCC-TARGET-panel.bed", col.names = col.names)
+# > data <- sequenza.extract("ONCGH-CRC01.seqz.gz", breaks = breaks)
+# > seg <- do.call(rbind, data$segments)
+# > seg$log2.depth.ratio <- log2(seg$depth.ratio)
+# > names(seg)[1] <- "chrom"
+# > df <- merge(breaks, seg)
+# > df <- df[, c(1, 2, 3, 4, 11)]
+# > df$call <- cut(df$log2.depth.ratio, breaks = c(-Inf, -1, 1, Inf), labels = c("DEL", "", "AMP"))
+# > write.csv(df, "ONCGH-CRC01.CNA.csv", row.names = F)
+
+# コピー数異常の視認
+gunzip -c ONCGH-CRC01.seqz.gz | tail -n+2 | awk '{ if(prev_chr != $1){print "variableStep chrom="$1}; print $2, log($6)/log(2); prev_chr=$1 }' > log2_depth_ratio.wig
+igv log2_depth_ratio.wig ERBB2
