@@ -14,7 +14,7 @@ Twitterの [#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参�
 * TBD
 
 ## 各章のコマンド群へのリンク
-* 第2章 がんのターゲットリシークエンシング
+* [第2章 がんのターゲットリシークエンシング](https://github.com/tanishimashigeki/TargetReseq.git)
 * [第3章 がんの融合遺伝子検出](Chapter3)
 * [第4章 がんのCNV検出（マイクロアレイ）](https://github.com/SuenoriChiku/ChatperCNA)
 * [第5章 がんの長鎖シークエンサーを用いたゲノム解析](Chapter5)
