@@ -92,17 +92,19 @@ sequenza-utils bam2seqz -n PBMC-ONCGH-CRC01.sort.mkdup.bam -t cfDNA-ONCGH-CRC01.
 curl -L -o IRCC-TARGET-panel.bed https://ndownloader.figshare.com/files/28576212
 R
 # 以下11行はRでの作業
-# > library(sequenza)
-# > col.names <- c("chrom", "start.pos", "end.pos", "gene")
-# > breaks <- read.table("IRCC-TARGET-panel.bed", col.names = col.names)
-# > data <- sequenza.extract("ONCGH-CRC01.seqz.gz", breaks = breaks)
-# > seg <- do.call(rbind, data$segments)
-# > seg$log2.depth.ratio <- log2(seg$depth.ratio)
-# > names(seg)[1] <- "chrom"
-# > df <- merge(breaks, seg)
-# > df <- df[, c(1, 2, 3, 4, 11)]
-# > df$call <- cut(df$log2.depth.ratio, breaks = c(-Inf, -1, 1, Inf), labels = c("DEL", "", "AMP"))
-# > write.csv(df, "ONCGH-CRC01.CNA.csv", row.names = F)
+library(sequenza)
+col.names <- c("chrom", "start.pos", "end.pos", "gene")
+breaks <- read.table("IRCC-TARGET-panel.bed", col.names = col.names)
+data <- sequenza.extract("ONCGH-CRC01.seqz.gz", breaks = breaks)
+seg <- do.call(rbind, data$segments)
+seg$log2.depth.ratio <- log2(seg$depth.ratio)
+names(seg)[1] <- "chrom"
+df <- merge(breaks, seg)
+df <- df[, c(1, 2, 3, 4, 11)]
+df$call <- cut(df$log2.depth.ratio, breaks = c(-Inf, -1, 1, Inf), labels = c("DEL", "", "AMP"))
+write.csv(df, "ONCGH-CRC01.CNA.csv", row.names = F)
+# Rを終了してターミナルに戻る
+q()
 
 # コピー数異常の視認
 gunzip -c ONCGH-CRC01.seqz.gz | tail -n+2 | awk '{ if(prev_chr != $1){print "variableStep chrom="$1}; print $2, log($6)/log(2); prev_chr=$1 }' > log2_depth_ratio.wig
