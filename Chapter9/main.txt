@@ -28,12 +28,13 @@ tar zxvf annovar.latest.tar.gz
 # Sequenzaのインストール
 R
 # 以下6行はRでの作業
-# > if (!requireNamespace("BiocManager", quietly = TRUE))
-#      install.packages("BiocManager")
-# > BiocManager::install("copynumber")
-# > install.packages("sequenza")
-# > library(sequenza)
-# > q()
+if (!requireNamespace("BiocManager", quietly = TRUE))
+     install.packages("BiocManager")
+BiocManager::install("copynumber")
+install.packages("sequenza")
+library(sequenza)
+# Rを終了してターミナルに戻る
+q()
 
 # sequenza-utilsのインストール
 /usr/local/bin/pip3 install sequenza-utils --user
