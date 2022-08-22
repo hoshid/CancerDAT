@@ -20,7 +20,7 @@ Twitterの [#CancerDAT](https://twitter.com/hashtag/CancerDAT) タグもご参�
 * [第5章 がんの長鎖シークエンサーを用いたゲノム解析](Chapter5)
 * [第6章 がんのGWAS](https://github.com/yyoi/CancerGWAS)
 * [第7章 がんのPRSによる疾患発症リスク予測](https://github.com/hacchy1983/prs-on-hail-public)
-* 第8章 がんのエピゲノム解析
+* [第8章 がんのエピゲノム解析](https://github.com/H-Ohmomo/CancerDAT)
 * [第9章 がんのcfDNA解析](Chapter9)
 
 ## 質問・コメントなど
